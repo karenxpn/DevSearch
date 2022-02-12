@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .utils import search_profiles
+from .utils import search_profiles, paginate_profiles
 from .models import Profile, Skill
 from .forms import CustomUserCreationForm, ProfileForm, SkillForm
 
@@ -66,8 +66,10 @@ def register_user(request):
 
 def profiles(request):
     all_profiles, search_query = search_profiles(request)
+    custom_range, all_profiles = paginate_profiles(request, all_profiles, 3)
     context = {'profiles': all_profiles,
-               'search_query': search_query}
+               'search_query': search_query,
+               'custom_range': custom_range}
     return render(request, 'users/profiles.html', context)
 
 
