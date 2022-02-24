@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Project
+from .models import Project, Tag
 from .forms import ProjectForm, ReviewForm
 from .utils import search_project, paginate_projects
 
@@ -46,11 +46,17 @@ def create_project(request):
     form = ProjectForm()
 
     if request.method == 'POST':
+        new_tags = request.POST.get('newtags').replace(',', ' ').split()
         form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             project = form.save(commit=False)
             project.owner = profile
             project.save()
+
+            for tag in new_tags:
+                tag, created = Tag.objects.get_or_create(name=tag)
+                project.tags.add(tag)
+
             form.save_m2m()
             return redirect('account')
 
@@ -65,9 +71,14 @@ def update_project(request, pk):
     form = ProjectForm(instance=project)
 
     if request.method == 'POST':
+        new_tags = request.POST.get('newtags').replace(',', ' ').split()
         form = ProjectForm(request.POST, request.FILES, instance=project)
         if form.is_valid():
-            form.save()
+            project = form.save()
+            for tag in new_tags:
+                tag, created = Tag.objects.get_or_create(name=tag)
+                project.tags.add(tag)
+
             return redirect('account')
 
     context = {'form': form}
