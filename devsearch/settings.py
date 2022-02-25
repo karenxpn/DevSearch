@@ -122,7 +122,6 @@ WSGI_APPLICATION = 'devsearch.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-print("a;lsdkfjalksdjflasdlf;j", os.environ.get("DB_USER"))
 
 DATABASES = {
     'default': {
